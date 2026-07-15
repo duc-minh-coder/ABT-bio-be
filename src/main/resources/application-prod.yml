@@ -1,0 +1,56 @@
+spring:
+  datasource:
+    url: "${DB_URL}"       # jdbc:postgresql://xxx
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # keep data across restarts
+    show-sql: false
+
+#  flyway:
+#    enabled: true
+#    baseline-on-migrate: true
+
+app:
+  jwt:
+    signerKey: "${SIGNER_KEY}"
+  frontend:
+    url: "${FRONTEND_PROD_URL}"
+  init-admin:
+    enabled: false
+    email: "${ADMIN_INIT_EMAIL}"
+    password: "${ADMIN_INIT_PASSWORD}"
+    bank: # stk của ng nhận
+      code: "${BANK_CODE:}" # :Ngân hàng mặc định nếu không set ENV
+      account-number: "${BANK_ACCOUNT:}" # Số tài khoản
+      account-name: "${BANK_ACCOUNT_NAME:}" # Tên chủ tài khoản (tùy chọn)
+
+    # PayPal configuration
+    paypal:
+      subject-email: "${PAYPAL_SUBJECT_EMAIL}" # Email chủ tài khoản PayPal Business (để gửi Payout)
+
+cloudinary:
+  cloud-name: "${CLOUDINARY_NAME}"
+  api-key: "${API_KEY}"
+  api-secret: "${API_SECRET}"
+
+payos:
+  client-id: "${PAYOS_CLIENT_ID}"
+  api-key: "${PAYOS_API_KEY}"
+  checksum-key: "${PAYOS_CHECKSUM_KEY}"
+  url:
+    create-payment: https://api-merchant.payos.vn/v2/payment-requests
+    #    transfer: https://api-merchant.payos.vn/v2/payment-requests/transfer
+    transfer: https://api-merchant.payos.vn/v1/payouts/batch
+
+logging:
+  level:
+    com.example.MMOGrocery: DEBUG # Để soi log xem webhook chạy ra sao
+
+server:
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      internal-proxies: .*
