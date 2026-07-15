@@ -127,7 +127,8 @@ public class AuthenticationService {
                 .provider(IdentityProviderEnum.LOCAL)
                 .providerUserId(request.getEmail())
                 .email(request.getEmail())
-                .verified(true)
+            .verified(true)
+            .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .createdAt(Instant.now())
                 .build();
         userIdentityRepository.save(identity);

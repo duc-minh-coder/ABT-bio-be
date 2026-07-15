@@ -63,16 +63,7 @@ public class Orders {
 
     // --- TÀI CHÍNH (Tiền nong) ---
     @Column(nullable = false)
-    BigDecimal unitPrice; // Giá 1 sản phẩm lúc mua
-
-    @Column(nullable = false)
     BigDecimal totalAmount; // Tổng tiền User phải trả (unitPrice * quantity)
-
-    @Column(nullable = false)
-    BigDecimal platformFee; // Phí sàn thu (Ví dụ 5% của totalAmount)
-
-    @Column(nullable = false)
-    BigDecimal netAmount; // Tiền thực nhận của Seller (totalAmount - platformFee)
 
     @Column(nullable = false, length = 10)
     String currency; // VND hoặc USD
@@ -104,37 +95,6 @@ public class Orders {
 
     @UpdateTimestamp
     Instant updatedAt;
-
-    // --- AFFILIATE ---
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "referrer_id")
-    @JsonIgnore
-    Users referrer; // Người giới thiệu (null nếu không qua link affiliate)
-
-    @Column(name = "affiliate_commission", precision = 19, scale = 2, nullable = false)
-    @Builder.Default
-    BigDecimal affiliateCommission = BigDecimal.ZERO; // Tiền hoa hồng cắt cho Referrer
-
-    @Column(name = "affiliate_percent_snapshot", precision = 5, scale = 2, nullable = false)
-    @Builder.Default
-    BigDecimal affiliatePercentSnapshot = BigDecimal.ZERO; // % hoa hồng lúc mua (để đối soát)
-
-    @Column(name = "referral_code_used", length = 20)
-    String referralCodeUsed; // Mã giới thiệu đã dùng
-
-    // --- KHIẾU NẠI ---
-    // Nội dung khiếu nại
-    @Column(name = "complaint_content", columnDefinition = "TEXT")
-    String complaintContent;
-
-    // Thay boolean bằng Enum
-    @Enumerated(EnumType.STRING)
-    @Column(name = "complaint_status")
-    @Builder.Default
-    ReportStatusEnum complaintStatus = ReportStatusEnum.PENDING; // Mặc định là PENDING
-
-    @Column(name = "is_report_read")
-    Boolean isReportRead;
 
     // Cờ xóa mềm
     @Column(name = "is_complaint_deleted")

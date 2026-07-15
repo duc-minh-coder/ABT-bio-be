@@ -1,6 +1,6 @@
 package com.NMCNPM.ABT_bio.configuration;
 
-import com.example.MMOGrocery.repository.InvalidTokenRepository;
+import com.NMCNPM.ABT_bio.repository.InvalidTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

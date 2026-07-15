@@ -1,7 +1,7 @@
 package com.NMCNPM.ABT_bio.configuration;
 
-import com.example.MMOGrocery.dto.response.ApiResponse;
-import com.example.MMOGrocery.exception.ErrorCode;
+import com.NMCNPM.ABT_bio.dto.ApiResponse;
+import com.NMCNPM.ABT_bio.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
