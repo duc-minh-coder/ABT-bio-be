@@ -1,5 +1,6 @@
 package com.NMCNPM.ABT_bio.dto.response;
 
+import com.NMCNPM.ABT_bio.enums.RoleEnum;
 import com.NMCNPM.ABT_bio.enums.UserStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -14,16 +15,13 @@ import java.util.UUID;
 public class AuthUserProjectionResponse {
     UUID userId;
     String email;
-    String referralCode;
 
     @JsonIgnore
     String passwordHash;
-    String role;
+    RoleEnum role;
     UserStatusEnum status;
     String fullName;
     String avatarUrl;
-    Boolean mustChangePassword;
 
     String contactEmail;
-    UUID shopId;
 }

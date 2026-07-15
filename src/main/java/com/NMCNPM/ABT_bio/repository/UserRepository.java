@@ -82,14 +82,7 @@ public interface UserRepository extends JpaRepository<Users, UUID> {
         WHERE u.role = 'ADMIN'
     """)
     long countAdmins();
-
-    Optional<Users> findByReferralCode(String referralCode);
-
-    boolean existsByReferralCode(String referralCode);
+    ;
 
     List<Users> findAllByIdentity_Email(String email);
-
-    Optional<Users> findByTelegramChatId(String telegramChatId);
-
-    Page<Users> findAllByTelegramChatIdIsNotNull(Pageable pageable);
 }

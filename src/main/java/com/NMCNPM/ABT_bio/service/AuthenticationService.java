@@ -127,8 +127,8 @@ public class AuthenticationService {
                 .provider(IdentityProviderEnum.LOCAL)
                 .providerUserId(request.getEmail())
                 .email(request.getEmail())
-            .verified(true)
-            .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .verified(true)
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .createdAt(Instant.now())
                 .build();
         userIdentityRepository.save(identity);
@@ -165,7 +165,7 @@ public class AuthenticationService {
         return AuthUserProjectionResponse.builder()
                 .userId(user.getId())
                 .email(identity.getEmail())
-                .role(user.getRole().toString())
+                .role(user.getRole())
                 .status(user.getStatus())
                 .fullName(user.getFullName())
                 .avatarUrl(user.getAvatarUrl())
@@ -196,7 +196,6 @@ public class AuthenticationService {
                 .claim("provider", provider)
                 .claim("contactEmail", user.getContactEmail())
                 .claim("fullName", user.getFullName())
-                .claim("shopId", user.getShopId() != null ? user.getShopId().toString() : null)
                 .build();
 
         JWSObject jws = new JWSObject(header, new Payload(claims.toJSONObject()));
@@ -234,7 +233,7 @@ public class AuthenticationService {
 
         Date expiryTime = (isRefresh) ?
                 new Date(signedJWT.getJWTClaimsSet().getIssueTime()
-                        .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()) :
+                         .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()) :
                 signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(jwsVerifier);

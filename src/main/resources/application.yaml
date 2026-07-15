@@ -4,6 +4,8 @@ spring:
 
   datasource:
     url: ${DB_URL}
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 50
@@ -25,6 +27,8 @@ spring:
       client:
         registration:
           google:
+            client-id: "${GOOGLE_CLIENT_ID:fake-google-client-id}"
+            client-secret: "${GOOGLE_CLIENT_SECRET:fake-google-client-secret}"
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - email
@@ -57,8 +61,34 @@ server:
 
 app:
   jwt:
+    signerKey: "${SIGNER_KEY}"
     valid-duration: 3600
     refreshable-duration: 3600
+  frontend:
+    url: "${FRONTEND_PROD_URL}"
+  init-admin:
+    enabled: false
+    email: "${ADMIN_INIT_EMAIL}"
+    password: "${ADMIN_INIT_PASSWORD}"
+    bank: # stk của ng nhận
+      code: "${BANK_CODE:}" # :Ngân hàng mặc định nếu không set ENV
+      account-number: "${BANK_ACCOUNT:}" # Số tài khoản
+      account-name: "${BANK_ACCOUNT_NAME:}" # Tên chủ tài khoản (tùy chọn)
+
+    # PayPal configuration
+    paypal:
+      subject-email: "${PAYPAL_SUBJECT_EMAIL}" # Email chủ tài khoản PayPal Business (để gửi Payout)
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_NAME}
+  cloud-name: "${CLOUDINARY_NAME}"
+  api-key: "${API_KEY}"
+  api-secret: "${API_SECRET}"
+
+payos:
+  client-id: "${PAYOS_CLIENT_ID}"
+  api-key: "${PAYOS_API_KEY}"
+  checksum-key: "${PAYOS_CHECKSUM_KEY}"
+  url:
+    create-payment: https://api-merchant.payos.vn/v2/payment-requests
+    #    transfer: https://api-merchant.payos.vn/v2/payment-requests/transfer
+    transfer: https://api-merchant.payos.vn/v1/payouts/batch

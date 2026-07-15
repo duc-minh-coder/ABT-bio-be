@@ -28,12 +28,12 @@ public interface UserIdentityRepository extends JpaRepository<UserIdentity, UUID
         SELECT new com.NMCNPM.ABT_bio.dto.response.AuthUserProjectionResponse(
             user.id,
             userIdentity.providerUserId,
+            CAST(NULL AS string),
             user.role,
             user.status,
             user.fullName,
             user.avatarUrl,
-            user.contactEmail,
-            CAST(NULL AS uuid)
+            user.contactEmail
         )
         FROM UserIdentity userIdentity
         JOIN userIdentity.user user
@@ -48,12 +48,12 @@ public interface UserIdentityRepository extends JpaRepository<UserIdentity, UUID
         SELECT new com.NMCNPM.ABT_bio.dto.response.AuthUserProjectionResponse(
             user.id,
             userIdentity.providerUserId,
+            CAST(NULL AS string),
             user.role,
             user.status,
             user.fullName,
             user.avatarUrl,
-            user.contactEmail,
-            CAST(NULL AS uuid)
+            user.contactEmail
         )
         FROM UserIdentity userIdentity
         JOIN userIdentity.user user
