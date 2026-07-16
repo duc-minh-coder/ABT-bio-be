@@ -4,6 +4,8 @@ import com.NMCNPM.ABT_bio.entity.Category;
 import com.NMCNPM.ABT_bio.repository.CategoryRepository;
 import com.NMCNPM.ABT_bio.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> list() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public Page<Category> listPaged(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
     }
 
     @Override

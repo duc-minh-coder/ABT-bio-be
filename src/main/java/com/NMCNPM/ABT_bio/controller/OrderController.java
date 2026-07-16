@@ -13,6 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -28,10 +31,10 @@ public class OrderController {
     }
 
     @GetMapping("/orders")
-    public ApiResponse<Page<OrderResponse>> listMyOrders(@RequestParam(defaultValue = "0") int page,
+    public ApiResponse<List<OrderResponse>> listMyOrders(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "20") int size) {
         Page<Orders> p = orderService.list(PageRequest.of(page, size));
-        Page<OrderResponse> mapped = p.map(apiContractMapper::toOrderResponse);
-        return ApiResponse.<Page<OrderResponse>>builder().code(0).result(mapped).build();
+        List<OrderResponse> mapped = p.getContent().stream().map(apiContractMapper::toOrderResponse).collect(Collectors.toList());
+        return ApiResponse.<List<OrderResponse>>builder().code(0).result(mapped).build();
     }
 }

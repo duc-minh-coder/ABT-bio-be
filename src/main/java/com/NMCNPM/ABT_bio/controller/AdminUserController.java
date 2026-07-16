@@ -1,13 +1,13 @@
 package com.NMCNPM.ABT_bio.controller;
 
 import com.NMCNPM.ABT_bio.entity.Users;
-import com.NMCNPM.ABT_bio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import com.NMCNPM.ABT_bio.dto.ApiResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -16,9 +16,10 @@ public class AdminUserController {
     private final com.NMCNPM.ABT_bio.service.UserService userService;
 
     @GetMapping("/users")
-    public ApiResponse<Page<Users>> listUsers(@RequestParam(defaultValue = "0") int page,
+    public ApiResponse<List<Users>> listUsers(@RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "20") int size) {
-        return ApiResponse.<Page<Users>>builder().code(0).result(userService.list(PageRequest.of(page, size))).build();
+        Page<Users> p = userService.list(PageRequest.of(page, size));
+        return ApiResponse.<List<Users>>builder().code(0).result(p.getContent()).build();
     }
 
     @GetMapping("/users/{id}")

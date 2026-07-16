@@ -1,9 +1,9 @@
 package com.NMCNPM.ABT_bio.controller;
 
 import com.NMCNPM.ABT_bio.entity.Category;
-import com.NMCNPM.ABT_bio.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.NMCNPM.ABT_bio.dto.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +16,10 @@ public class CategoryController {
     private final com.NMCNPM.ABT_bio.service.CategoryService categoryService;
 
     @GetMapping("/categories")
-    public ApiResponse<List<Category>> list() {
-        return ApiResponse.<List<Category>>builder().code(0).result(categoryService.list()).build();
+    public ApiResponse<List<Category>> list(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "20") int size) {
+        var p = categoryService.listPaged(PageRequest.of(page, size));
+        return ApiResponse.<List<Category>>builder().code(0).result(p.getContent()).build();
     }
 
     @PostMapping("/admin/categories")

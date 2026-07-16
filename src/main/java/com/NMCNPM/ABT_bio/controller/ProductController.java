@@ -19,10 +19,10 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/products")
-    public ApiResponse<Page<Product>> listProducts(@RequestParam(defaultValue = "0") int page,
+    public ApiResponse<List<Product>> listProducts(@RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "20") int size) {
         var p = productService.list(PageRequest.of(page, size));
-        return ApiResponse.<Page<Product>>builder().code(0).result(p).build();
+        return ApiResponse.<List<Product>>builder().code(0).result(p.getContent()).build();
     }
 
     @GetMapping("/products/{id}")
