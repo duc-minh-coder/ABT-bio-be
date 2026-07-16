@@ -2,9 +2,11 @@ package com.NMCNPM.ABT_bio.service;
 
 import com.NMCNPM.ABT_bio.dto.request.CheckoutItemRequest;
 import com.NMCNPM.ABT_bio.dto.request.CheckoutRequest;
+import com.NMCNPM.ABT_bio.dto.response.CartItemResponse;
 import com.NMCNPM.ABT_bio.dto.response.OrderItemResponse;
 import com.NMCNPM.ABT_bio.dto.response.OrderResponse;
 import com.NMCNPM.ABT_bio.dto.response.ProductResponse;
+import com.NMCNPM.ABT_bio.entity.Cart;
 import com.NMCNPM.ABT_bio.entity.Orders;
 import com.NMCNPM.ABT_bio.entity.Product;
 import com.NMCNPM.ABT_bio.repository.ProductRepository;
@@ -82,6 +84,25 @@ public class ApiContractMapper {
 
     public CheckoutRequest toCheckoutRequest(Orders order) {
         return parseBuyerContent(order.getBuyerContent());
+    }
+
+    public CartItemResponse toCartItemResponse(Cart.CartItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        Product product = productRepository.findById(item.getProductId()).orElse(null);
+        return CartItemResponse.builder()
+                .product(toProductResponse(product))
+                .quantity(item.getQuantity())
+                .build();
+    }
+
+    public List<CartItemResponse> toCartItemResponses(List<Cart.CartItem> items) {
+        if (items == null) {
+            return Collections.emptyList();
+        }
+        return items.stream().map(this::toCartItemResponse).collect(Collectors.toList());
     }
 
     public List<OrderItemResponse> toOrderItemResponses(List<CheckoutItemRequest> items) {

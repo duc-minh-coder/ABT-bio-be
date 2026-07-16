@@ -1,7 +1,9 @@
 package com.NMCNPM.ABT_bio;
 
+import com.NMCNPM.ABT_bio.dto.response.CartItemResponse;
 import com.NMCNPM.ABT_bio.dto.response.OrderResponse;
 import com.NMCNPM.ABT_bio.dto.response.ProductResponse;
+import com.NMCNPM.ABT_bio.entity.Cart;
 import com.NMCNPM.ABT_bio.entity.Category;
 import com.NMCNPM.ABT_bio.entity.Product;
 import com.NMCNPM.ABT_bio.entity.Orders;
@@ -79,5 +81,34 @@ class ApiContractMapperTest {
         assertThat(response.getItems()).hasSize(1);
         assertThat(response.getPaymentStatus()).isEqualTo("paid");
         assertThat(response.getStatus()).isEqualTo("paid");
+    }
+
+    @Test
+    void toCartItemResponse_mapsCartItemToDto() {
+        Product product = Product.builder()
+                .id(7L)
+                .name("DNA Extractor")
+                .slug("dna-extractor")
+                .thumbnailUrl("/dna.png")
+                .inventoryCount(10)
+                .category(Category.builder().name("Lab Tools").build())
+                .build();
+
+        when(productRepository.findById(7L)).thenReturn(Optional.of(product));
+
+        Cart.CartItem item = Cart.CartItem.builder()
+                .productId(7L)
+                .productName("DNA Extractor")
+                .quantity(3)
+                .unitPrice(new BigDecimal("500000"))
+                .currency("VND")
+                .build();
+
+        CartItemResponse response = mapper.toCartItemResponse(item);
+
+        assertThat(response.getProduct()).isNotNull();
+        assertThat(response.getProduct().getId()).isEqualTo(7L);
+        assertThat(response.getProduct().getName()).isEqualTo("DNA Extractor");
+        assertThat(response.getQuantity()).isEqualTo(3);
     }
 }

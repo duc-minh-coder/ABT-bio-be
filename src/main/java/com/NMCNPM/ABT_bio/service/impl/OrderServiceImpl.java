@@ -38,30 +38,66 @@ public class OrderServiceImpl implements OrderService {
         Users user = userRepository.findByContactEmail(userEmail).orElseThrow();
         Cart cart = cartRepository.findByUser(user).orElseThrow();
 
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new AppException(ErrorCode.CART_EMPTY);
+        }
+
+        // Khởi tạo Đơn hàng (chưa có tổng tiền và items)
         Orders order = Orders.builder()
                 .orderCode("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .buyer(user)
                 .buyerContent(toBuyerContent(req))
-                .productName(req.getItems() != null && !req.getItems().isEmpty() ? req.getItems().get(0).getProductId().toString() : "")
-                .quantity(req.getItems() != null ? req.getItems().stream().mapToInt(item -> item.getQuantity() == null ? 0 : item.getQuantity()).sum() : 0)
-                .totalAmount(req.getTotal() == null ? BigDecimal.ZERO : req.getTotal())
                 .currency("VND")
                 .status(mapStatus(req.getStatus()))
                 .createdAt(Instant.now())
+                .orderItems(new java.util.ArrayList<>())
                 .build();
 
-        if (req.getItems() != null) {
-            req.getItems().forEach(item -> {
-                Product product = productRepository.findById(item.getProductId()).orElse(null);
-                if (product != null) {
-                    product.setInventoryCount(Math.max(0, product.getInventoryCount() - (item.getQuantity() == null ? 0 : item.getQuantity())));
-                    productRepository.save(product);
-                }
-            });
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        // Quét toàn bộ giỏ hàng để tạo OrderItem và tính tiền
+        for (Cart.CartItem cartItem : cart.getItems()) {
+            Product product = productRepository.findById(cartItem.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + cartItem.getProductId()));
+
+            int buyQty = cartItem.getQuantity();
+
+            // Kiểm tra tồn kho chặt chẽ
+            if (product.getInventoryCount() < buyQty) {
+                throw new RuntimeException("Sản phẩm '" + product.getName() + "' không đủ số lượng trong kho!");
+            }
+
+            // Trừ tồn kho
+            product.setInventoryCount(product.getInventoryCount() - buyQty);
+            productRepository.save(product);
+
+            // Lấy giá chuẩn xác từ Product DB
+            BigDecimal unitPrice = product.getPrices().isEmpty() ? BigDecimal.ZERO : product.getPrices().get(0).getAmount();
+
+            // Tính tổng tiền cho item này và cộng dồn vào tổng hóa đơn
+            BigDecimal itemTotal = unitPrice.multiply(BigDecimal.valueOf(buyQty));
+            totalAmount = totalAmount.add(itemTotal);
+
+            // Tạo chi tiết đơn hàng
+            OrderItem orderItem = OrderItem.builder()
+                    .order(order)
+                    .product(product)
+                    .quantity(buyQty)
+                    .unitPrice(unitPrice)
+                    .productNameSnapshot(product.getName())
+                    .build();
+
+            order.getOrderItems().add(orderItem);
         }
 
+        // Chốt tổng tiền an toàn vào đơn hàng
+        order.setTotalAmount(totalAmount);
+
+        // Xóa toàn bộ giỏ hàng
         cart.getItems().clear();
         cartRepository.save(cart);
+
+        // Lưu đơn hàng
         return orderRepository.save(order);
     }
 
