@@ -8,13 +8,15 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class OrderResponse {
-    private String id;
+    private UUID id;
+    private String orderCode;
     private Instant date;
     private String customerName;
     private String email;

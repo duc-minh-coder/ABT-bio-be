@@ -119,6 +119,9 @@ public enum ErrorCode {
     PRODUCT_MIN_MAX(1006, "Số lượng mua tối thiểu không được lớn hơn số lượng mua tối đa!", HttpStatus.BAD_REQUEST),
     PRODUCT_PRICE_EMPTY(1007, "Sản phẩm phải có ít nhất 1 mức giá!", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_DELETED(1008, "Sản phẩm này chưa bị xoá!", HttpStatus.BAD_REQUEST),
+    CART_NOT_FOUND(1009, "CART_NOT_FOUND", HttpStatus.NOT_FOUND),
+    PRODUCT_OUT_OF_STOCK(1010, "không đủ số lượng trong kho", HttpStatus.BAD_REQUEST),
+    CART_EMPTY(1011, "Giỏ hàng đang trống, không thể thanh toán!", HttpStatus.BAD_REQUEST),
     // 4000 - 4099: ROLE
     ROLE_NOT_FOUND(4000, "role not found", HttpStatus.NOT_FOUND),
     USER_ROLE_LOWEST(4001, "user role lowest", HttpStatus.BAD_REQUEST),

@@ -12,6 +12,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -37,11 +39,6 @@ public class Orders {
     @JsonIgnore
     Users buyer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    @JsonIgnore
-    Product product;
-
     // --- QUAN HỆ THANH TOÁN ---
     // Link trực tiếp đến Transaction để biết đơn này trả bằng giao dịch nào
     @OneToOne(fetch = FetchType.LAZY)
@@ -51,15 +48,6 @@ public class Orders {
 
     @JoinColumn(name = "buyer_content", columnDefinition = "TEXT")
     String buyerContent;
-
-    // --- SNAPSHOT (Lưu cứng thông tin LÚC MUA) ---
-    // Để sau này Seller sửa tên/giá sản phẩm thì đơn hàng cũ không bị đổi theo
-    @Column(name = "product_name_snapshot", nullable = false)
-    String productName;
-
-    @Column(name = "quantity", nullable = false)
-    @Builder.Default
-    Integer quantity = 1;
 
     // --- TÀI CHÍNH (Tiền nong) ---
     @Column(nullable = false)
@@ -103,4 +91,8 @@ public class Orders {
 
     @Column(name = "message", columnDefinition = "TEXT")
     String message;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    List<OrderItem> orderItems = new ArrayList<>();
 }

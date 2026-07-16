@@ -24,8 +24,8 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
 
     @Override
-    public Page<Product> list(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public Page<Product> list(String keyword, Long categoryId, Pageable pageable) {
+        return productRepository.searchProducts(keyword, categoryId, pageable);
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ProductService {
-    Page<Product> list(Pageable pageable);
+    Page<Product> list(String keyword, Long categoryId, Pageable pageable);
     Product get(Long id);
     List<Product> bestSelling();
     Product create(CreateProductRequest req, String sellerEmail);
