@@ -1,7 +1,6 @@
 package com.NMCNPM.ABT_bio.configuration;
 
 import com.NMCNPM.ABT_bio.service.AuthenticationService;
-import com.NMCNPM.ABT_bio.service.CustomOAuth2UserService;
 import jakarta.servlet.http.Cookie;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class SecurityConfig {
         protected String frontEndUrl;
 
         private final CustomJwtDecoder customJwtDecoder;
-        private final CustomOAuth2UserService customOAuth2UserService;
+//        private final CustomOAuth2UserService customOAuth2UserService;
         private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
         String[] PUBLIC_ENDPOINT = {
@@ -123,11 +122,6 @@ public class SecurityConfig {
                                 // Client error reporting (FE gửi lỗi về, không cần auth)
                                 .requestMatchers(HttpMethod.POST, "/api/client-errors").permitAll()
                                 .anyRequest().authenticated());
-
-                http.oauth2Login(oauth2 -> oauth2
-                                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-                                                .userService(customOAuth2UserService))
-                                .successHandler(oAuth2AuthenticationSuccessHandler));
 
                 // JWT Resource Server
                 http.oauth2ResourceServer(oauth2 -> oauth2

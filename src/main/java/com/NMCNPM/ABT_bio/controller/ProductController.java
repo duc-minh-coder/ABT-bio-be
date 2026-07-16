@@ -19,9 +19,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/products")
-    public ApiResponse<List<Product>> listProducts(@RequestParam(defaultValue = "0") int page,
-                                                      @RequestParam(defaultValue = "20") int size) {
-        var p = productService.list(PageRequest.of(page, size));
+    public ApiResponse<List<Product>> listProducts(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        var p = productService.list(keyword, categoryId, PageRequest.of(page, size));
         return ApiResponse.<List<Product>>builder().code(0).result(p.getContent()).build();
     }
 
