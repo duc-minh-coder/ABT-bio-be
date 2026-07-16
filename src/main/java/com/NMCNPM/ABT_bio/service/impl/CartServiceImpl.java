@@ -4,6 +4,8 @@ import com.NMCNPM.ABT_bio.dto.request.AddCartRequest;
 import com.NMCNPM.ABT_bio.entity.Cart;
 import com.NMCNPM.ABT_bio.entity.Product;
 import com.NMCNPM.ABT_bio.entity.Users;
+import com.NMCNPM.ABT_bio.exception.AppException;
+import com.NMCNPM.ABT_bio.exception.ErrorCode;
 import com.NMCNPM.ABT_bio.repository.CartRepository;
 import com.NMCNPM.ABT_bio.repository.ProductRepository;
 import com.NMCNPM.ABT_bio.repository.UserRepository;
@@ -20,7 +22,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCartByUserEmail(String email) {
-        Users user = userRepository.findByContactEmail(email).orElseThrow();
+        Users user = userRepository.findByContactEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return cartRepository.findByUser(user).orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
     }
 
@@ -28,7 +30,7 @@ public class CartServiceImpl implements CartService {
     public Cart addToCart(String email, AddCartRequest req) {
         Users user = userRepository.findByContactEmail(email).orElseThrow();
         Cart cart = cartRepository.findByUser(user).orElseGet(() -> Cart.builder().user(user).build());
-        Product product = productRepository.findById(req.getProductId()).orElseThrow();
+        Product product = productRepository.findById(req.getProductId()).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         Cart.CartItem item = Cart.CartItem.builder()
                 .productId(product.getId())
                 .productName(product.getName())
