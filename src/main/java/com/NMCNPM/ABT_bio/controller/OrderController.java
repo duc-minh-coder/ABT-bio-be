@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,20 +42,37 @@ public class OrderController {
         return ApiResponse.<List<OrderResponse>>builder().code(0).result(mapped).build();
     }
 
-    @GetMapping("/orders/completed")
-    public ApiResponse<List<OrderResponse>> listPaidOrders(@RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "20") int size) {
+    // API 1: Dành cho User thường (Chỉ lấy đơn của mình)
+    @GetMapping("/my-completed")
+    public ApiResponse<List<OrderResponse>> getMyCompletedOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
         UUID userId = SecurityUtils.getCurrentUserId();
-        boolean isAdmin = SecurityUtils.isAdmin(); // Bạn cần hàm check quyền của bạn
+        List<OrderStatusEnum> statuses = List.of(OrderStatusEnum.PAID, OrderStatusEnum.COMPLETED);
 
-        List<OrderStatusEnum> targetStatuses = List.of(OrderStatusEnum.PAID, OrderStatusEnum.COMPLETED);
+        Page<Orders> p = orderService.findOrdersByBuyer(userId, statuses, PageRequest.of(page, size));
 
-        Page<Orders> p = orderService.listOrdersByStatus(userId, isAdmin, targetStatuses, PageRequest.of(page, size));
+        return ApiResponse.<List<OrderResponse>>builder()
+                .code(0)
+                .result(p.getContent().stream().map(apiContractMapper::toOrderResponse).toList())
+                .build();
+    }
 
-        List<OrderResponse> mapped = p.getContent().stream()
-                .map(apiContractMapper::toOrderResponse)
-                .collect(Collectors.toList());
+    // API 2: Dành cho Admin (Lấy tất cả đơn đã hoàn thành của mọi người)
+    @GetMapping("/admin/completed")
+    @PreAuthorize("hasRole('ADMIN')") // Chỉ Admin mới vào được
+    public ApiResponse<List<OrderResponse>> getAllCompletedOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
 
-        return ApiResponse.<List<OrderResponse>>builder().code(0).result(mapped).build();
+        List<OrderStatusEnum> statuses = List.of(OrderStatusEnum.PAID, OrderStatusEnum.COMPLETED);
+
+        Page<Orders> p = orderService.findAllOrdersByStatus(statuses, PageRequest.of(page, size));
+
+        return ApiResponse.<List<OrderResponse>>builder()
+                .code(0)
+                .result(p.getContent().stream().map(apiContractMapper::toOrderResponse).toList())
+                .build();
     }
 }

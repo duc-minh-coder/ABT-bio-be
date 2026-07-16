@@ -163,6 +163,16 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public Page<Orders> findOrdersByBuyer(UUID buyerId, List<OrderStatusEnum> statuses, Pageable pageable) {
+        return orderRepository.findByBuyerIdAndStatusIn(buyerId, statuses, pageable);
+    }
+
+    @Override
+    public Page<Orders> findAllOrdersByStatus(List<OrderStatusEnum> statuses, Pageable pageable) {
+        return orderRepository.findByStatusIn(statuses, pageable);
+    }
+
 
     private String toBuyerContent(CheckoutRequest req) {
         try {

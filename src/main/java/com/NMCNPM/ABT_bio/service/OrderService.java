@@ -16,4 +16,7 @@ public interface OrderService {
     void markOrderAsPaid(PaymentTransactions tx);
 
     Page<Orders> listOrdersByStatus(UUID userId, boolean isAdmin, List<OrderStatusEnum> statuses, Pageable pageable);
+
+    Page<Orders> findOrdersByBuyer(UUID buyerId, List<OrderStatusEnum> statuses, Pageable pageable);
+    Page<Orders> findAllOrdersByStatus(List<OrderStatusEnum> statuses, Pageable pageable);
 }
