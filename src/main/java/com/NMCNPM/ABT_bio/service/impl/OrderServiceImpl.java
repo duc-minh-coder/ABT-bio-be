@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static com.NMCNPM.ABT_bio.enums.OrderStatusEnum.*;
@@ -34,8 +35,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Orders checkout(String userEmail, CheckoutRequest req) {
-        Users user = userRepository.findByContactEmail(userEmail).orElseThrow();
+    public Orders checkout(UUID userId, CheckoutRequest req) {
+        Users user = userRepository.findById(userId).orElseThrow();
+
         Cart cart = cartRepository.findByUser(user).orElseThrow();
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
@@ -46,9 +48,9 @@ public class OrderServiceImpl implements OrderService {
         Orders order = Orders.builder()
                 .orderCode("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .buyer(user)
-                .buyerContent(toBuyerContent(req))
+                .buyerContent(req.getNotes())
                 .currency("VND")
-                .status(mapStatus(req.getStatus()))
+                .status(PENDING)
                 .createdAt(Instant.now())
                 .orderItems(new java.util.ArrayList<>())
                 .build();
@@ -94,8 +96,8 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
 
         // Xóa toàn bộ giỏ hàng
-        cart.getItems().clear();
-        cartRepository.save(cart);
+//        cart.getItems().clear();
+//        cartRepository.save(cart);
 
         // Lưu đơn hàng
         return orderRepository.save(order);
@@ -141,7 +143,24 @@ public class OrderServiceImpl implements OrderService {
         // 6. Lưu lại vào Database
         orderRepository.save(order);
 
+        // 6. XÓA GIỎ HÀNG SAU KHI THANH TOÁN
+        Cart cart = cartRepository.findByUser(order.getBuyer()).orElse(null);
+        if (cart != null) {
+            cart.getItems().clear();
+            cartRepository.save(cart);
+            log.info("🛒 Đã làm trống giỏ hàng của user sau khi thanh toán thành công.");
+        }
+
         log.info("✅ Đơn hàng {} đã được thanh toán thành công!", order.getOrderCode());
+    }
+
+    @Override
+    public Page<Orders> listOrdersByStatus(UUID userId, boolean isAdmin, List<OrderStatusEnum> statuses, Pageable pageable) {
+        if (isAdmin) {
+            return orderRepository.findByStatusIn(statuses, pageable);
+        } else {
+            return orderRepository.findByBuyerIdAndStatusIn(userId, statuses, pageable);
+        }
     }
 
 

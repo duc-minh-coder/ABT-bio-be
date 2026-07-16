@@ -66,7 +66,8 @@ public class ApiContractMapper {
                 : List.of();
 
         return OrderResponse.builder()
-                .id(order.getOrderCode())
+                .id(order.getId())
+                .orderCode(order.getOrderCode())
                 .date(order.getCreatedAt())
                 .customerName(payload != null ? payload.getCustomerName() : null)
                 .email(payload != null ? payload.getEmail() : null)

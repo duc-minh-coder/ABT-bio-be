@@ -17,28 +17,20 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CheckoutRequest {
-    @NotBlank(message = "CUSTOMER_NAME_REQUIRED")
     private String customerName;
 
-    @NotBlank(message = "CUSTOMER_EMAIL_REQUIRED")
-    @Email(message = "INVALID_EMAIL")
     private String email;
 
-    @NotBlank(message = "PHONE_REQUIRED")
     private String phone;
 
-    @NotBlank(message = "ADDRESS_REQUIRED")
     private String address;
 
     private String organization;
 
-    @NotBlank(message = "PAYMENT_METHOD_REQUIRED")
     private String paymentMethod;
 
-    @NotNull(message = "ITEMS_REQUIRED")
     private List<CheckoutItemRequest> items;
 
-    @NotNull(message = "TOTAL_REQUIRED")
     private BigDecimal total;
 
     private String notes;
