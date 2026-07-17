@@ -1,8 +1,11 @@
 package com.NMCNPM.ABT_bio.configuration;
 
+import com.NMCNPM.ABT_bio.entity.OrderItem;
 import com.NMCNPM.ABT_bio.entity.Orders;
+import com.NMCNPM.ABT_bio.entity.Product;
 import com.NMCNPM.ABT_bio.enums.OrderStatusEnum;
 import com.NMCNPM.ABT_bio.repository.OrderRepository;
+import com.NMCNPM.ABT_bio.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,6 +22,7 @@ import java.util.List;
 public class OrderScheduler {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
     // Chạy mỗi 1 phút (60000ms)
     @Scheduled(fixedRate = 60000)
@@ -34,13 +38,25 @@ public class OrderScheduler {
         );
 
         if (!pendingOrders.isEmpty()) {
-            log.info("Đang hủy {} đơn hàng quá hạn...", pendingOrders.size());
+            log.info("Đang hủy {} đơn hàng quá hạn và hoàn trả tồn kho...", pendingOrders.size());
 
             for (Orders order : pendingOrders) {
+                // HỒN TRẢ SỐ LƯỢNG SẢN PHẨM VÀO KHO
+                for (OrderItem item : order.getOrderItems()) {
+                    Product product = item.getProduct();
+                    if (product != null) {
+                        int currentStock = product.getInventoryCount() != null ? product.getInventoryCount() : 0;
+                        product.setInventoryCount(currentStock + item.getQuantity());
+                        productRepository.save(product);
+                        log.info("  ↳ Hoàn trả {} x sản phẩm ID: {} ({})",
+                                item.getQuantity(), product.getId(), product.getName());
+                    }
+                }
+
+                // Đổi status đơn hàng
                 order.setStatus(OrderStatusEnum.CANCELLED);
-                // Lưu lại
                 orderRepository.save(order);
-                log.info("Đã hủy đơn hàng: {}", order.getOrderCode());
+                log.info("✅ Đã hủy đơn hàng: {}", order.getOrderCode());
             }
         }
     }
