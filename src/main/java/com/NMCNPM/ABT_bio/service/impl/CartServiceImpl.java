@@ -44,10 +44,22 @@ public class CartServiceImpl implements CartService {
                 .filter(item -> item.getProductId().equals(product.getId()))
                 .findFirst();
 
+        // TÍNH TỔNG SỐ LƯỢNG SẼ CÓ TRONG GIỎ SAU KHI ADD
+        int currentQuantityInCart = existingItemOpt
+                .map(Cart.CartItem::getQuantity)
+                .orElse(0);
+        int totalQuantityAfterAdd = currentQuantityInCart + quantityToAdd;
+
+        // KIỂM TRA TỒN KHO
+        int availableInventory = product.getInventoryCount() != null ? product.getInventoryCount() : 0;
+        if (totalQuantityAfterAdd > availableInventory) {
+            throw new AppException(ErrorCode.NOT_ENOUGH_INVENTORY);
+        }
+
         if (existingItemOpt.isPresent()) {
             // Đã có trong giỏ -> Cộng dồn số lượng
             Cart.CartItem existingItem = existingItemOpt.get();
-            existingItem.setQuantity(existingItem.getQuantity() + quantityToAdd);
+            existingItem.setQuantity(totalQuantityAfterAdd);
         } else {
             // Chưa có trong giỏ -> Thêm item mới
             Cart.CartItem newItem = Cart.CartItem.builder()
